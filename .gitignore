@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# Artifacts & data (don't commit weights or datasets)
+artifacts/
+*.pt
+*.ckpt
+data/
+*.tar
+*.csv.gz
+
+# Tooling (not part of the project)
+build_notebook.py
+build_notebook_tagging.py
+_clean.py

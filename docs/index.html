@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multimodal Product Tagging — CLIP</title>
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --border:#30363d; --text:#e6edf3;
+    --muted:#9198a1; --accent:#58a6ff; --good:#3fb950; --bad:#f85149; --chip:#1f6feb22;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;padding:0 16px}
+  .wrap{max-width:880px;margin:0 auto;padding:48px 0 64px}
+  h1{font-size:2.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+  h2{font-size:1.3rem;margin:40px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);color:var(--accent)}
+  .sub{color:var(--muted);font-size:1.05rem;margin-bottom:20px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .links{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}
+  .btn{background:var(--card);border:1px solid var(--border);padding:8px 16px;border-radius:8px;font-weight:600;font-size:.92rem}
+  .btn:hover{border-color:var(--accent);text-decoration:none}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .chip{background:var(--chip);border:1px solid var(--border);color:var(--accent);padding:3px 11px;border-radius:20px;font-size:.8rem;font-weight:600}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin:16px 0}
+  table{width:100%;border-collapse:collapse;margin:6px 0;font-size:.95rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-weight:600;font-size:.82rem;text-transform:uppercase;letter-spacing:.03em}
+  td.n{font-variant-numeric:tabular-nums;font-weight:600}
+  .good{color:var(--good)} .bad{color:var(--bad)}
+  .big{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:12px 0}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+  .stat .l{color:var(--muted);font-size:.8rem;margin-top:4px}
+  pre{background:#0b0f14;border:1px solid var(--border);border-radius:8px;padding:14px;overflow-x:auto;font-size:.85rem;color:#c9d1d9;line-height:1.5}
+  .note{color:var(--muted);font-size:.9rem;margin-top:8px}
+  footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Multimodal Product Tagging</h1>
+  <p class="sub">One <b>CLIP</b> model reads a product's <b>image + title</b> and auto-tags it with
+  <b>four catalog attributes at once</b> — category, colour, gender, season — and stays accurate
+  even when the title is missing.</p>
+
+  <div class="chips">
+    <span class="chip">CLIP (ViT-B/32)</span>
+    <span class="chip">PyTorch</span>
+    <span class="chip">Multi-task</span>
+    <span class="chip">DistilBERT + ResNet-50</span>
+    <span class="chip">Robustness analysis</span>
+    <span class="chip">30K products</span>
+  </div>
+
+  <div class="links">
+    <a class="btn" href="https://github.com/Hridye5h/multimodal-product-tagging">⌨ Code on GitHub</a>
+    <a class="btn" href="https://github.com/Hridye5h/multimodal-product-tagging/blob/main/notebooks/multimodal_product_tagging.ipynb">📓 CLIP notebook</a>
+    <a class="btn" href="https://github.com/Hridye5h/multimodal-product-tagging/blob/main/notebooks/multimodal_product_categorization.ipynb">📓 Fusion notebook</a>
+  </div>
+
+  <h2>What it does</h2>
+  <p>E-commerce catalogs need every product tagged with many attributes — that tagging is normally
+  manual. This model does it automatically from the product photo and its title in a single forward
+  pass, using <b>CLIP's aligned vision-language embeddings</b> with one classification head per attribute.</p>
+  <pre>  title  ─►┐
+            ├─►  CLIP  ─►  shared trunk  ─►  ┬─► category   (98%)
+  image  ─►┘   (aligned                     ├─► colour     (94%)
+               embeddings)                  ├─► gender     (99%)
+                                            └─► season     (79%)</pre>
+
+  <h2>Results — one model, four attributes</h2>
+  <p class="note">CLIP ViT-B/32 (frozen) + trained heads, on 30,466 products from the Fashion Product Images dataset.</p>
+  <div class="card">
+    <table>
+      <tr><th>Attribute</th><th>Classes</th><th>With title</th><th>Title removed</th></tr>
+      <tr><td>articleType (category)</td><td class="n">20</td><td class="n good">0.978</td><td class="n">0.927</td></tr>
+      <tr><td>baseColour</td><td class="n">15</td><td class="n good">0.935</td><td class="n">0.744</td></tr>
+      <tr><td>gender</td><td class="n">5</td><td class="n good">0.991</td><td class="n">0.893</td></tr>
+      <tr><td>season</td><td class="n">4</td><td class="n">0.785</td><td class="n">0.710</td></tr>
+      <tr><td><b>Mean</b></td><td class="n">—</td><td class="n good"><b>0.922</b></td><td class="n"><b>0.819</b></td></tr>
+    </table>
+  </div>
+
+  <h2>The interesting part — robustness to missing metadata</h2>
+  <p>Real catalogs have sparse or junk titles. A model that leans only on text breaks when the title
+  is gone. By training with random "missing title" augmentation, this model <b>falls back on the
+  image</b> — so mean accuracy only drops from <b>92% → 82%</b> when titles are removed, instead of
+  collapsing.</p>
+  <p>The single-modality ablation (separate DistilBERT + ResNet-50) makes the point sharply:</p>
+  <div class="card">
+    <table>
+      <tr><th>Model</th><th>With title</th><th>Title removed</th></tr>
+      <tr><td>Text-only (DistilBERT)</td><td class="n">0.975</td><td class="n bad">0.028</td></tr>
+      <tr><td>Image-only (ResNet-50)</td><td class="n">0.905</td><td class="n">0.905</td></tr>
+      <tr><td><b>Fusion (both)</b></td><td class="n good"><b>0.980</b></td><td class="n good"><b>0.886</b></td></tr>
+    </table>
+    <p class="note">When titles vanish, text-only collapses to ~3% while fusion holds ~89% —
+    a <b class="good">+86-point</b> robustness gain by using the image.</p>
+  </div>
+
+  <h2>How it's built</h2>
+  <div class="grid">
+    <div class="stat"><div class="big">2</div><div class="l">model variants (fusion + CLIP multi-task)</div></div>
+    <div class="stat"><div class="big">30K</div><div class="l">products, 44 attribute classes</div></div>
+    <div class="stat"><div class="big">4</div><div class="l">attributes tagged per pass</div></div>
+  </div>
+  <p>Reproducible Kaggle notebooks, modular PyTorch source (data / model / training split into
+  importable modules), discriminative-LR fine-tuning, a synthetic-data fallback so the pipeline runs
+  without the dataset, and a comma-safe CSV reader for the messy real metadata. Full code and the
+  executed notebooks (with outputs) are on
+  <a href="https://github.com/Hridye5h/multimodal-product-tagging">GitHub</a>.</p>
+
+  <footer>
+    Hridyesh Kumar · IIIT Allahabad · built with PyTorch, CLIP &amp; Transformers ·
+    <a href="https://github.com/Hridye5h/multimodal-product-tagging">github.com/Hridye5h/multimodal-product-tagging</a>
+  </footer>
+
+</div>
+</body>
+</html>
