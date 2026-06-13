@@ -73,11 +73,12 @@ def predict(image, title):
 
 with gr.Blocks(title="Multimodal Product Tagger") as demo:
     gr.Markdown(
-        "# 🏷️ Multimodal Product Tagger\n"
-        "Upload a product image and (optionally) its title. One CLIP-based model predicts "
-        "**four catalog attributes at once** — category, colour, gender, season.\n\n"
-        "Try it **with the title blank** too: the model falls back on the image, so visual "
-        "attributes like colour and category still come through."
+        """# 🏷️ Multimodal Product Tagger
+Upload a product image and (optionally) its title. One CLIP-based model predicts
+**four catalog attributes at once** — category, colour, gender, season.
+
+Try it **with the title blank** too: the model falls back on the image, so visual
+attributes like colour and category still come through."""
     )
     with gr.Row():
         with gr.Column():
