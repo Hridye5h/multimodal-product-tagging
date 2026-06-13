@@ -13,6 +13,7 @@ Both share a theme: product titles often name the attribute outright, so text al
 scores high. The more interesting question is **robustness** — when the title is
 missing (as it often is in real catalogs), does the model fall back on the image?
 
+🎮 **[Try the live demo →](https://huggingface.co/spaces/Hr1dye5h/product-tagger)** — upload a product image, get its tags instantly.
 📊 **[Results & write-up →](https://hridye5h.github.io/multimodal-product-tagging/)**
 
 ## Results
