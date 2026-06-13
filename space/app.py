@@ -16,8 +16,10 @@ CLIP_MODEL = "openai/clip-vit-base-patch32"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 RAW = "https://raw.githubusercontent.com/Hridye5h/multimodal-product-tagging/main/space"
 
-# Pull the trained weights + label maps on first start.
-for fname in ("heads.pt", "tag_label_maps.json"):
+# Pull the trained weights, label maps, and example images on first start.
+EXAMPLES = ["tshirt.jpg", "watch.jpg", "shoes.jpg", "handbag.jpg"]
+os.makedirs("examples", exist_ok=True)
+for fname in ["heads.pt", "tag_label_maps.json"] + [f"examples/{e}" for e in EXAMPLES]:
     if not os.path.exists(fname):
         urllib.request.urlretrieve(f"{RAW}/{fname}", fname)
 
@@ -77,6 +79,10 @@ with gr.Blocks(title="Multimodal Product Tagger") as demo:
 Upload a product image and (optionally) its title. One CLIP-based model predicts
 **four catalog attributes at once** — category, colour, gender, season.
 
+ℹ️ Works best on **clean catalog-style product photos** (single item, plain background) —
+that's the data it was trained on. **Click an example below** to see it work. Real-world
+selfies are out-of-distribution and will be off.
+
 Try it **with the title blank** too: the model falls back on the image, so visual
 attributes like colour and category still come through."""
     )
@@ -92,5 +98,10 @@ attributes like colour and category still come through."""
             o3 = gr.Label(label="Gender", num_top_classes=5)
             o4 = gr.Label(label="Season", num_top_classes=4)
     btn.click(predict, [img, txt], [o1, o2, o3, o4])
+    gr.Examples(
+        examples=[[f"examples/{e}", ""] for e in EXAMPLES],
+        inputs=[img, txt],
+        label="Catalog examples — click one, then press “Tag it”",
+    )
 
 demo.launch()
